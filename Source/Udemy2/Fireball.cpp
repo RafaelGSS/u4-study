@@ -59,6 +59,5 @@ void AFireball::BeginPlay()
 void AFireball::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
