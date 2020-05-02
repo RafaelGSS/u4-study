@@ -26,7 +26,12 @@ AActorRotator::AActorRotator()
 void AActorRotator::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	FTransform NewTransform = FTransform(
+		FRotator(45.f, 45.f, 90.f),
+		FVector(30.f, 30.f, 30.f),
+		FVector(0.1f, 0.1f, 0.1f)
+	);
+	AddActorLocalTransform(NewTransform);
 }
 
 // Called every frame
