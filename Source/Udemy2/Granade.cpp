@@ -11,6 +11,12 @@
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/StaticMeshActor.h"
+#include "EngineUtils.h"
+#include "UObject/UObjectIterator.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/SkeletalMeshActor.h"
+#include "UObject/UObjectBaseUtility.h"
 
 // Sets default values
 AGranade::AGranade()
@@ -53,10 +59,10 @@ AGranade::AGranade()
 void AGranade::BeginPlay()
 {
 	Super::BeginPlay();
-	this->SlowTime(0.1f);
+	this->SlowTime(0.9f);
 	this->GranadeMesh->SetSimulatePhysics(true);
 	this->GranadeMesh->SetEnableGravity(true);
-	GetWorldTimerManager().SetTimer(this->Timer, this, &AGranade::ExplodeGranade, 5.f, false);
+	GetWorldTimerManager().SetTimer(this->Timer, this, &AGranade::ExplodeGranade, 2.f, false);
 }
 
 void AGranade::SlowTime(float delay)
@@ -71,6 +77,29 @@ void AGranade::RestoreTime()
 	GetWorldTimerManager().ClearTimer(this->TimeTimer);
 }
 
+void AGranade::ImpulseRadial(float R, float Force)
+{
+	for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		UStaticMeshComponent* RootStaticMesh = Cast<UStaticMeshComponent>(ActorItr->GetRootComponent());
+		if (RootStaticMesh && RootStaticMesh->Mobility == EComponentMobility::Movable)
+		{
+			RootStaticMesh->SetSimulatePhysics(true);
+			RootStaticMesh->AddRadialImpulse(GetActorLocation(), R, Force,
+				ERadialImpulseFalloff::RIF_Linear, true);
+		}
+	}
+
+	for (TObjectIterator<USkeletalMeshComponent> It; It; ++It)
+	{
+		if (It->GetWorld() == GetWorld())
+		{
+			It->SetSimulatePhysics(true);
+			It->AddRadialImpulse(GetActorLocation(), R, Force, ERadialImpulseFalloff::RIF_Linear, true);
+		}
+	}
+}
+
 void AGranade::ExplodeGranade()
 {
 	SetLifeSpan(5.5f);
@@ -78,6 +107,7 @@ void AGranade::ExplodeGranade()
 	this->SlowTime(0.05);
 	this->ExplodeParticle->ActivateSystem();
 	this->GranadeMesh->SetVisibility(false);
+	this->ImpulseRadial(5000.f, 1000.f);
 }
 
 // Called every frame

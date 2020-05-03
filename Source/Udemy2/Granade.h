@@ -32,6 +32,9 @@ protected:
 	void RestoreTime();
 
 	UFUNCTION()
+	void ImpulseRadial(float R, float Force);
+
+	UFUNCTION()
 	void ExplodeGranade();
 public:	
 	// Called every frame

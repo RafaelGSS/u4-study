@@ -6,6 +6,18 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Granade.h"
+#include "UObject/ConstructorHelpers.h"
+
+AGranadeGameMode::AGranadeGameMode()
+{
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(
+		TEXT("Blueprint'/Game/ThirdPersonBP/Blueprints/ThirdPersonCharacter.ThirdPersonCharacter_C'")
+	);
+
+	if (PlayerPawnBPClass.Class != nullptr) {
+		this->DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+}
 
 void AGranadeGameMode::BeginPlay()
 {

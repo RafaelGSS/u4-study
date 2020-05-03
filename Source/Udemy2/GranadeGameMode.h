@@ -12,6 +12,7 @@
 UCLASS()
 class UDEMY2_API AGranadeGameMode : public AGameModeBase
 {
+	AGranadeGameMode();
 	GENERATED_BODY()
 	
 public:
